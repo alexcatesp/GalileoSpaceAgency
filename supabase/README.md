@@ -40,8 +40,9 @@ diagnostico(candidato_id FK, score_transversal, score_especifico)  -- privado de
 Este repo está preparado para que **Supabase aplique las migraciones solo** al hacer
 push. Pasos (una vez):
 
-1. Crea el proyecto en [supabase.com](https://supabase.com) y copia su **Reference ID**
-   (Project Settings → General).
+1. Crea el proyecto en [supabase.com](https://supabase.com) (nómbralo **`gasa-iesgalileo`**
+   — proyecto único reutilizable; la cohorte ya va en el `candidato_id`) y copia su
+   **Reference ID** (Project Settings → General).
 2. Pega ese ref en `supabase/config.toml` → `project_id = "..."`.
 3. En el dashboard: **Project Settings → Integrations → GitHub** → conecta este repo
    (`alexcatesp/iesgalileo_2627`) y elige la rama de producción. A partir de ahí, cada
