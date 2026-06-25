@@ -1,0 +1,130 @@
+---
+import Base from '../layouts/Base.astro';
+import rangoConfig from '../../core/progresion/rango.json';
+
+const rangos = rangoConfig.rangos;
+---
+
+<Base title="Credencial · GASA">
+  <main>
+    <p class="kicker">GAlileo Space Agency · Credencial</p>
+
+    <script type="application/json" id="gasa-rangos" is:inline set:html={JSON.stringify(rangos)} />
+
+    <div id="cargando" class="nota">Cargando credencial…</div>
+
+    <article id="carnet" class="carnet" hidden>
+      <div class="retrato">
+        <img id="c-avatar" alt="Avatar" />
+        <span id="c-rango" class="rango-badge"></span>
+      </div>
+      <div class="datos">
+        <p class="kicker">Tripulante</p>
+        <h1 id="c-callsign"></h1>
+        <p id="c-id" class="mono"></p>
+        <div class="xp">
+          <div class="xp-fila">
+            <span id="c-xp"></span>
+            <span id="c-sig" class="muted"></span>
+          </div>
+          <div class="barra"><div id="c-barra" class="barra-fill"></div></div>
+        </div>
+        <h2>Certificaciones</h2>
+        <ul id="c-logros" class="logros"></ul>
+      </div>
+    </article>
+
+    <p id="sin-sesion" class="nota" hidden>
+      No hay ninguna sesión. <a href="" id="link-ingreso">Vuelve a la ficha de ingreso</a>.
+    </p>
+
+    <p class="acciones">
+      <a id="btn-salir" href="#">Salir</a>
+    </p>
+  </main>
+
+  <style>
+    main { max-width: 46rem; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+    .kicker { color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; margin: 0; }
+    .nota, .muted { color: var(--muted); }
+    .carnet {
+      display: grid; grid-template-columns: auto 1fr; gap: 1.5rem; margin-top: 1rem;
+      padding: 1.5rem; border: 1px solid #25406b; border-radius: 1rem;
+      background: linear-gradient(160deg, #0e1c33, #0a1322);
+    }
+    .retrato { position: relative; }
+    .retrato img { width: 140px; height: 140px; border-radius: 0.8rem; }
+    .rango-badge {
+      position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
+      background: var(--accent); color: #04121f; font-weight: 700; font-size: 0.75rem;
+      padding: 0.2rem 0.6rem; border-radius: 1rem; white-space: nowrap;
+    }
+    h1 { margin: 0.1em 0; font-size: 2rem; }
+    .mono { font-family: ui-monospace, monospace; color: var(--muted); margin: 0; }
+    .xp { margin: 1.2rem 0; }
+    .xp-fila { display: flex; justify-content: space-between; font-size: 0.9rem; }
+    .barra { height: 8px; background: #0c1626; border-radius: 99px; overflow: hidden; margin-top: 0.3rem; }
+    .barra-fill { height: 100%; background: var(--accent); width: 0; transition: width 0.4s; }
+    h2 { font-size: 1rem; color: var(--accent); margin-top: 1.5rem; }
+    .logros { list-style: none; padding: 0; display: grid; gap: 0.4rem; }
+    .logros li { padding: 0.5rem 0.8rem; border: 1px solid #1e3357; border-radius: 0.5rem; background: #0c1626; display: flex; justify-content: space-between; }
+    .logros .vacio { color: var(--muted); border-style: dashed; }
+    .acciones { margin-top: 2rem; }
+    a { color: var(--accent); }
+  </style>
+
+  <script>
+    import { getEstado } from '../lib/estado/index';
+    import { credencialDerivada } from '../lib/progresion';
+    import type { Rango } from '../lib/tipos';
+
+    const rangos: Rango[] = JSON.parse(document.getElementById('gasa-rangos')!.textContent!);
+    const base = import.meta.env.BASE_URL.replace(/\/$/, ''); // sin barra final -> join seguro
+    const $ = (id: string) => document.getElementById(id)!;
+
+    (document.getElementById('link-ingreso') as HTMLAnchorElement).href = `${base}/ingreso`;
+
+    const estado = await getEstado();
+    const candidato = (await estado.sesionActual()) ? await estado.getCandidato() : null;
+
+    if (!candidato) {
+      $('cargando').hidden = true;
+      $('sin-sesion').hidden = false;
+    } else {
+      const logros = await estado.getLogros();
+      const cred = credencialDerivada(candidato, logros, rangos);
+
+      (document.getElementById('c-avatar') as HTMLImageElement).src = `${base}/avatares/${cred.avatar_id}.svg`;
+      $('c-rango').textContent = cred.rango.nombre;
+      $('c-callsign').textContent = cred.callsign;
+      $('c-id').textContent = cred.candidato_id;
+      $('c-xp').textContent = `${cred.xp_total} XP`;
+
+      const sig = cred.progreso_siguiente_rango;
+      if (sig) {
+        $('c-sig').textContent = `${sig.xp_restante} XP → ${sig.nombre}`;
+        const tramo = sig.xp_restante + (cred.xp_total - cred.rango.xp_umbral);
+        const pct = tramo > 0 ? Math.round((100 * (cred.xp_total - cred.rango.xp_umbral)) / tramo) : 0;
+        (document.getElementById('c-barra') as HTMLElement).style.width = `${pct}%`;
+      } else {
+        $('c-sig').textContent = 'Rango máximo';
+        (document.getElementById('c-barra') as HTMLElement).style.width = '100%';
+      }
+
+      $('c-logros').innerHTML = cred.logros.length
+        ? cred.logros
+            .map((l) => `<li><span>${l.il_id} · ${l.nivel}</span><span>${l.xp} XP</span></li>`)
+            .join('')
+        : '<li class="vacio">Aún sin certificaciones. Embarcas como Recluta con 0 XP.</li>';
+
+      $('cargando').hidden = true;
+      $('carnet').hidden = false;
+    }
+
+    (document.getElementById('btn-salir') as HTMLAnchorElement).addEventListener('click', async (e) => {
+      e.preventDefault();
+      await estado.logout();
+      location.href = `${base}/ingreso`;
+    });
+  </script>
+</Base>

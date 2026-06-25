@@ -1,0 +1,70 @@
+{
+  "descripcion": "Banco TRANSVERSAL de la ficha de ingreso — FIJO en el shell (PRD §7.3, agnóstico de módulo): razonamiento lógico, patrones, pensamiento con datos/conjuntos. RECORDATORIO: el diagnóstico es privado del profesor y sabor para el alumno; NO es XP ni ranking. Todos embarcan como Recluta con XP 0. `respuesta_correcta` es el índice (0-based) de la opción correcta y solo lo usa el corrector.",
+  "version": 1,
+  "categorias": ["razonamiento_logico", "patrones", "datos_conjuntos"],
+  "items": [
+    {
+      "id": "TR-LOG-1",
+      "categoria": "razonamiento_logico",
+      "enunciado": "Todos los reactores GR-7 necesitan revisión. La nave Aldrin monta un GR-7. ¿Qué se deduce con certeza?",
+      "opciones": ["La nave Aldrin necesita revisión", "Solo algunas naves necesitan revisión", "Ningún reactor necesita revisión", "No se puede deducir nada"],
+      "respuesta_correcta": 0
+    },
+    {
+      "id": "TR-LOG-2",
+      "categoria": "razonamiento_logico",
+      "enunciado": "En la secuencia de seguridad: si A implica B y B implica C, y A es verdadero, entonces…",
+      "opciones": ["C es verdadero", "C es falso", "B es falso", "No se puede saber"],
+      "respuesta_correcta": 0
+    },
+    {
+      "id": "TR-LOG-3",
+      "categoria": "razonamiento_logico",
+      "enunciado": "Negar la frase «todos los tripulantes han pasado el control» equivale a afirmar que…",
+      "opciones": ["Al menos un tripulante no ha pasado el control", "Ningún tripulante ha pasado el control", "Todos han pasado el control", "La mitad ha pasado el control"],
+      "respuesta_correcta": 0
+    },
+    {
+      "id": "TR-PAT-1",
+      "categoria": "patrones",
+      "enunciado": "Serie de potencia de la antena: 2, 4, 8, 16, … ¿Qué valor sigue?",
+      "opciones": ["32", "24", "20", "30"],
+      "respuesta_correcta": 0
+    },
+    {
+      "id": "TR-PAT-2",
+      "categoria": "patrones",
+      "enunciado": "Telemetría: 1, 1, 2, 3, 5, 8, … ¿Qué valor sigue?",
+      "opciones": ["13", "11", "10", "16"],
+      "respuesta_correcta": 0
+    },
+    {
+      "id": "TR-PAT-3",
+      "categoria": "patrones",
+      "enunciado": "Patrón de baliza: △ ○ △ ○ △ … ¿Qué símbolo sigue?",
+      "opciones": ["○", "△", "□", "✕"],
+      "respuesta_correcta": 0
+    },
+    {
+      "id": "TR-DAT-1",
+      "categoria": "datos_conjuntos",
+      "enunciado": "En la promoción, 12 candidatos saben Python y 8 saben SQL; 5 saben ambos. ¿Cuántos saben al menos uno de los dos?",
+      "opciones": ["15", "20", "25", "7"],
+      "respuesta_correcta": 0
+    },
+    {
+      "id": "TR-DAT-2",
+      "categoria": "datos_conjuntos",
+      "enunciado": "Dados los conjuntos A = {1, 2, 3} y B = {3, 4}, ¿cuál es A ∩ B (intersección)?",
+      "opciones": ["{3}", "{1, 2, 3, 4}", "{ }", "{1, 2}"],
+      "respuesta_correcta": 0
+    },
+    {
+      "id": "TR-DAT-3",
+      "categoria": "datos_conjuntos",
+      "enunciado": "La mediana de las lecturas [3, 1, 9, 4, 2] es…",
+      "opciones": ["3", "4", "2", "9"],
+      "respuesta_correcta": 0
+    }
+  ]
+}

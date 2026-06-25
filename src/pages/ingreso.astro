@@ -1,0 +1,247 @@
+---
+import Base from '../layouts/Base.astro';
+import bancoTransversal from '../../core/ingreso/banco_transversal.json';
+import avataresCfg from '../../core/carnet/avatares.json';
+// Bloque ESPECÍFICO: parametrizado por módulo. MVP -> instancia _template.
+// (El selector de módulo es trabajo posterior; aquí se fija la convención.)
+import moduloCfg from '../../modules/_template/modulo.json';
+import diagEspecifico from '../../modules/_template/diagnostico_especifico.json';
+
+const data = {
+  transversal: bancoTransversal.items,
+  especifico: diagEspecifico.items,
+  avatares: avataresCfg.avatares,
+  modulo: { nombre: moduloCfg.nombre, planeta: moduloCfg.planeta, arco: moduloCfg.arco },
+};
+---
+
+<Base title="Día de ingreso · GASA">
+  <main>
+    <p class="kicker">GAlileo Space Agency · Día de ingreso</p>
+    <h1>Ficha de ingreso</h1>
+    <p class="lead">
+      La GASA convoca una nueva promoción de <strong>candidatos</strong>. Esta ficha es a
+      la vez tu <strong>diagnóstico</strong> y tu <strong>alta</strong>: completa los
+      bloques, elige tu <em>callsign</em> y tu avatar, y recibirás tu credencial. Todos
+      embarcáis como <strong>Recluta</strong> — la nota de ingreso no puntúa.
+    </p>
+
+    <!-- Datos del shell + módulo, para el script de cliente -->
+    <script type="application/json" id="gasa-data" is:inline set:html={JSON.stringify(data)} />
+
+    <!-- Paso 1 — Acceso seudónimo -->
+    <section id="paso-login" class="paso">
+      <h2>1 · Acceso</h2>
+      <p class="nota">Entra con tu <code>candidato_id</code> y tu código. Sin nombre, sin email.</p>
+      <form id="form-login" class="campos">
+        <label>candidato_id
+          <input name="candidato_id" placeholder="GASA-2627-001" autocomplete="off" required />
+        </label>
+        <label>Código de acceso
+          <input name="codigo" placeholder="6 caracteres" autocomplete="off" required />
+        </label>
+        <button type="submit">Entrar</button>
+      </form>
+      <p id="login-error" class="error" hidden></p>
+    </section>
+
+    <!-- Paso 2 — Ficha (diagnóstico + callsign + avatar) -->
+    <section id="paso-ficha" class="paso" hidden>
+      <h2>2 · Diagnóstico</h2>
+      <p class="nota" id="ficha-sub"></p>
+
+      <h3>Bloque transversal</h3>
+      <div id="bloque-transversal" class="preguntas"></div>
+
+      <h3>Bloque específico <span id="esp-modulo" class="muted"></span></h3>
+      <div id="bloque-especifico" class="preguntas"></div>
+
+      <h2>3 · Alta</h2>
+      <form id="form-alta" class="campos">
+        <label>Callsign (tu alias de tripulante)
+          <input name="callsign" placeholder="p. ej. Nova" minlength="2" maxlength="24" autocomplete="off" required />
+        </label>
+        <fieldset>
+          <legend>Elige tu avatar (galería cerrada)</legend>
+          <div id="galeria" class="galeria"></div>
+        </fieldset>
+        <button type="submit">Completar ingreso →</button>
+      </form>
+      <p id="alta-error" class="error" hidden></p>
+    </section>
+
+    <p id="modo-badge" class="modo"></p>
+  </main>
+
+  <style>
+    main { max-width: 52rem; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+    .kicker { color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; margin: 0; }
+    h1 { font-size: clamp(2.2rem, 8vw, 3.4rem); margin: 0.2em 0 0.3em; }
+    .lead { color: var(--fg); max-width: 50ch; }
+    h2 { margin-top: 2.5rem; font-size: 1.25rem; border-bottom: 1px solid #1e3357; padding-bottom: 0.3rem; }
+    h3 { margin-top: 1.6rem; font-size: 1rem; color: var(--accent); }
+    .nota, .muted { color: var(--muted); font-size: 0.9rem; }
+    .campos { display: grid; gap: 1rem; max-width: 32rem; margin-top: 1rem; }
+    label { display: grid; gap: 0.3rem; font-size: 0.95rem; }
+    input {
+      padding: 0.6rem 0.8rem; border-radius: 0.5rem; border: 1px solid #25406b;
+      background: #0c1626; color: var(--fg); font-size: 1rem;
+    }
+    fieldset { border: 1px solid #1e3357; border-radius: 0.6rem; padding: 1rem; }
+    legend { padding: 0 0.5rem; color: var(--muted); font-size: 0.9rem; }
+    button {
+      justify-self: start; padding: 0.6rem 1.2rem; border-radius: 0.5rem; border: 0;
+      background: var(--accent); color: #04121f; font-weight: 700; cursor: pointer; font-size: 1rem;
+    }
+    button:disabled { opacity: 0.5; cursor: progress; }
+    .preguntas { display: grid; gap: 1.2rem; margin-top: 0.8rem; }
+    .pregunta { padding: 1rem; border: 1px solid #1e3357; border-radius: 0.6rem; background: #0c1626; }
+    .pregunta p { margin: 0 0 0.6rem; font-weight: 600; }
+    .opciones { display: grid; gap: 0.4rem; }
+    .opciones label { flex-direction: row; display: flex; gap: 0.5rem; align-items: center; font-weight: 400; }
+    .galeria { display: flex; flex-wrap: wrap; gap: 0.8rem; }
+    .galeria label { cursor: pointer; text-align: center; gap: 0.3rem; font-size: 0.8rem; }
+    .galeria img { width: 76px; height: 76px; border-radius: 0.6rem; border: 3px solid transparent; display: block; }
+    .galeria input { display: none; }
+    .galeria input:checked + img { border-color: var(--accent); }
+    .error { color: #ff8a8a; }
+    .modo { margin-top: 3rem; color: var(--muted); font-size: 0.8rem; }
+    code { background: #0c1626; padding: 0.1em 0.4em; border-radius: 0.3em; color: var(--accent); }
+  </style>
+
+  <script>
+    import { getEstado } from '../lib/estado/index';
+    import { puntuarBloque, type Respuesta } from '../lib/ingreso';
+    import type { ItemDiagnostico } from '../lib/tipos';
+
+    interface Data {
+      transversal: ItemDiagnostico[];
+      especifico: ItemDiagnostico[];
+      avatares: { avatar_id: string; nombre: string }[];
+      modulo: { nombre: string; planeta: string; arco: string };
+    }
+
+    const data: Data = JSON.parse(document.getElementById('gasa-data')!.textContent!);
+    const base = import.meta.env.BASE_URL.replace(/\/$/, ''); // sin barra final -> join seguro
+    const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
+
+    const estado = await getEstado();
+    $('modo-badge').textContent =
+      estado.modo === 'local'
+        ? 'Modo local (sin Supabase): los datos se guardan en este navegador.'
+        : 'Conectado a Supabase.';
+
+    // Si ya hay sesión y alta, saltar directo a la credencial.
+    const sesion = await estado.sesionActual();
+    if (sesion && (await estado.yaDadoDeAlta())) {
+      location.href = `${base}/credencial`;
+    } else if (sesion) {
+      mostrarFicha();
+    }
+
+    // --- Render de un bloque de preguntas -----------------------------------
+    function renderPreguntas(cont: HTMLElement, items: ItemDiagnostico[], grupo: string) {
+      cont.innerHTML = items
+        .map(
+          (it) => `
+        <div class="pregunta">
+          <p>${escapeHtml(it.enunciado)}</p>
+          <div class="opciones">
+            ${it.opciones
+              .map(
+                (op, i) => `<label><input type="radio" name="${grupo}:${it.id}" value="${i}"> ${escapeHtml(op)}</label>`,
+              )
+              .join('')}
+          </div>
+        </div>`,
+        )
+        .join('');
+    }
+
+    function recogerRespuestas(items: ItemDiagnostico[], grupo: string): Respuesta[] {
+      return items.map((it) => {
+        const sel = document.querySelector<HTMLInputElement>(`input[name="${grupo}:${it.id}"]:checked`);
+        return { id: it.id, eleccion: sel ? Number(sel.value) : -1 };
+      });
+    }
+
+    function mostrarFicha() {
+      $('paso-login').hidden = true;
+      $('paso-ficha').hidden = false;
+      $('ficha-sub').textContent = `Misión: ${data.modulo.nombre} · ${data.modulo.planeta}.`;
+      $('esp-modulo').textContent = `(módulo: ${data.modulo.nombre})`;
+      renderPreguntas($('bloque-transversal'), data.transversal, 'tr');
+      renderPreguntas($('bloque-especifico'), data.especifico, 'esp');
+      const gal = $('galeria');
+      gal.innerHTML = data.avatares
+        .map(
+          (a, i) => `
+        <label>
+          <input type="radio" name="avatar" value="${a.avatar_id}" ${i === 0 ? 'checked' : ''}>
+          <img src="${base}/avatares/${a.avatar_id}.svg" alt="${escapeHtml(a.nombre)}">
+          ${escapeHtml(a.nombre)}
+        </label>`,
+        )
+        .join('');
+    }
+
+    // --- Paso 1: login ------------------------------------------------------
+    $<HTMLFormElement>('form-login').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.target as HTMLFormElement;
+      const err = $('login-error');
+      err.hidden = true;
+      try {
+        await estado.login(
+          (f.elements.namedItem('candidato_id') as HTMLInputElement).value,
+          (f.elements.namedItem('codigo') as HTMLInputElement).value,
+        );
+        if (await estado.yaDadoDeAlta()) {
+          location.href = `${base}/credencial`;
+          return;
+        }
+        mostrarFicha();
+      } catch (ex) {
+        err.textContent = (ex as Error).message;
+        err.hidden = false;
+      }
+    });
+
+    // --- Paso 3: alta (una entrada -> candidato + diagnostico) ---------------
+    $<HTMLFormElement>('form-alta').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const f = e.target as HTMLFormElement;
+      const err = $('alta-error');
+      err.hidden = true;
+      const btn = f.querySelector('button')!;
+      btn.disabled = true;
+      try {
+        const callsign = (f.elements.namedItem('callsign') as HTMLInputElement).value.trim();
+        const avatar = document.querySelector<HTMLInputElement>('input[name="avatar"]:checked');
+        if (!avatar) throw new Error('Elige un avatar.');
+
+        // Diagnóstico: sabor para el alumno, privado para el profesor. NO es XP.
+        const scoreTr = puntuarBloque(data.transversal, recogerRespuestas(data.transversal, 'tr'));
+        const scoreEsp = data.especifico.length
+          ? puntuarBloque(data.especifico, recogerRespuestas(data.especifico, 'esp'))
+          : null;
+
+        await estado.completarIngreso({
+          callsign,
+          avatar_id: avatar.value,
+          score_transversal: scoreTr,
+          score_especifico: scoreEsp,
+        });
+        location.href = `${base}/credencial`;
+      } catch (ex) {
+        err.textContent = (ex as Error).message;
+        err.hidden = false;
+        btn.disabled = false;
+      }
+    });
+
+    function escapeHtml(s: string): string {
+      return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+    }
+  </script>
+</Base>

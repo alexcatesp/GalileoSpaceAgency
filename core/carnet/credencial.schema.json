@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Credencial GASA (objeto DERIVADO)",
+  "description": "La credencial NO se persiste (PRD §5.5): se compone al vuelo a partir de `candidato` + sus `logro` + la config de `rango`. Este esquema documenta la forma del objeto que consume la plantilla de render del carnet.",
+  "type": "object",
+  "required": ["candidato_id", "callsign", "avatar_id", "rango", "xp_total", "logros"],
+  "additionalProperties": false,
+  "properties": {
+    "candidato_id": { "type": "string", "pattern": "^GASA-[0-9]{4}-[0-9]{3}$" },
+    "callsign": { "type": "string" },
+    "avatar_id": { "type": "string", "description": "Referencia a la galería cerrada (core/carnet/avatares.json)." },
+    "alta_ts": { "type": "string", "format": "date-time" },
+    "xp_total": { "type": "integer", "minimum": 0, "description": "Σ logro.xp — derivado, no almacenado." },
+    "rango": {
+      "type": "object",
+      "required": ["rango_id", "nombre"],
+      "properties": {
+        "rango_id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "xp_umbral": { "type": "integer" },
+        "orden": { "type": "integer" }
+      }
+    },
+    "progreso_siguiente_rango": {
+      "type": ["object", "null"],
+      "description": "Hueco hasta el siguiente rango (null si ya es el máximo).",
+      "properties": {
+        "rango_id": { "type": "string" },
+        "nombre": { "type": "string" },
+        "xp_restante": { "type": "integer" }
+      }
+    },
+    "logros": {
+      "type": "array",
+      "description": "Certificaciones obtenidas (filas de `logro`). Append-only.",
+      "items": {
+        "type": "object",
+        "required": ["il_id", "nivel", "xp"],
+        "properties": {
+          "il_id": { "type": "string" },
+          "nivel": { "type": "string", "enum": ["Suficiente", "Notable", "Excelente"] },
+          "xp": { "type": "integer" },
+          "ts": { "type": "string", "format": "date-time" }
+        }
+      }
+    }
+  }
+}

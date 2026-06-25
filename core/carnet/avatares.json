@@ -1,0 +1,12 @@
+{
+  "descripcion": "Galería CERRADA de avatares (PRD §2 no-objetivos, §7.4): set de retratos predefinidos, sin editor y sin imagen personal. `avatar_id` es lo que se guarda en `candidato.avatar_id`. Los assets viven en `public/avatares/<avatar_id>.svg` y se sirven como estáticos.",
+  "ruta_assets": "avatares",
+  "avatares": [
+    { "avatar_id": "av-cian",    "nombre": "Traje Cian" },
+    { "avatar_id": "av-ambar",   "nombre": "Traje Ámbar" },
+    { "avatar_id": "av-verde",   "nombre": "Traje Verde" },
+    { "avatar_id": "av-magenta", "nombre": "Traje Magenta" },
+    { "avatar_id": "av-violeta", "nombre": "Traje Violeta" },
+    { "avatar_id": "av-rojo",    "nombre": "Traje Rojo" }
+  ]
+}

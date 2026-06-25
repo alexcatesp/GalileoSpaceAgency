@@ -9,9 +9,11 @@
     "start": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "check": "astro check"
+    "check": "astro check",
+    "provision": "node tools/provision/provision.mjs"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
     "astro": "^4.16.0"
   },
   "devDependencies": {

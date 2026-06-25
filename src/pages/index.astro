@@ -13,7 +13,8 @@ import rangoConfig from '../../core/progresion/rango.json';
         de Logro; el rango, el mapa y la credencial se <em>derivan</em> de un único log de
         logros.
       </p>
-      <p class="estado">🚧 Andamiaje v0.1 — estructura del monorepo. Sin Día 1 funcional todavía.</p>
+      <p class="estado">v0.2 — Día 1 funcional (ficha de ingreso → credencial).</p>
+      <p class="cta"><a href={`${import.meta.env.BASE_URL.replace(/\/$/, '')}/ingreso`}>Entrar al Día de ingreso →</a></p>
     </header>
 
     <section>
@@ -39,6 +40,7 @@ import rangoConfig from '../../core/progresion/rango.json';
     h1 { font-size: clamp(3rem, 12vw, 6rem); margin: 0.2em 0 0.1em; letter-spacing: 0.05em; }
     .lead { color: var(--fg); font-size: 1.15rem; max-width: 40ch; }
     .estado { color: var(--muted); font-size: 0.95rem; }
+    .cta a { display: inline-block; margin-top: 0.5rem; padding: 0.6rem 1.2rem; border-radius: 0.5rem; background: var(--accent); color: #04121f; font-weight: 700; text-decoration: none; }
     h2 { margin-top: 3rem; font-size: 1.3rem; }
     .rangos { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
     .rangos li {

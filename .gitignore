@@ -28,6 +28,11 @@ mapeo*
 mapping*.csv
 orla*
 *.private.csv
+reparto*
+.provision/
+
+# pero SÍ versionamos la orla de ejemplo (nombres ficticios, documenta el formato)
+!tools/provision/orla.ejemplo.csv
 
 # logs / sistema
 *.log
