@@ -45,7 +45,7 @@ push. Pasos (una vez):
    **Reference ID** (Project Settings → General).
 2. Pega ese ref en `supabase/config.toml` → `project_id = "..."`.
 3. En el dashboard: **Project Settings → Integrations → GitHub** → conecta este repo
-   (`alexcatesp/iesgalileo_2627`) y elige la rama de producción. A partir de ahí, cada
+   (`alexcatesp/GalileoSpaceAgency`) y elige la rama de producción. A partir de ahí, cada
    push con migraciones nuevas se aplica a la BD.
 4. Copia `.env.example` → `.env` y rellena `PUBLIC_SUPABASE_URL` /
    `PUBLIC_SUPABASE_ANON_KEY` (Project Settings → API).

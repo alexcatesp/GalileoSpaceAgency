@@ -64,7 +64,7 @@ de cada módulo es **configuración/data**, no una línea de desarrollo. `/core`
 **una vez** y todos los módulos lo heredan, sin peaje de merge.
 
 ```
-ies-galileo-26-27/
+GalileoSpaceAgency/
 ├── core/                  # el shell agnóstico de módulo (única fuente de verdad)
 │   ├── carnet/            #   esquema del perfil/credencial + plantilla de render
 │   ├── progresion/        #   rango ↔ il ↔ xp (config: rango.json)

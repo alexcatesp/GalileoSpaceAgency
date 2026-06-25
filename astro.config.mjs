@@ -9,7 +9,7 @@ import { defineConfig } from 'astro/config';
 // de entorno para no acoplar el build a una URL concreta.
 export default defineConfig({
   site: process.env.SITE_URL || 'https://alexcatesp.github.io',
-  base: process.env.BASE_PATH || '/iesgalileo_2627',
+  base: process.env.BASE_PATH || '/GalileoSpaceAgency',
   output: 'static',
   trailingSlash: 'ignore',
 });
