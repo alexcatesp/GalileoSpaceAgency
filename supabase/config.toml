@@ -1,0 +1,47 @@
+# =============================================================================
+# config.toml — configuración del proyecto Supabase (GASA)
+# Necesario para la integración GitHub → Supabase (aplica supabase/migrations/).
+#
+# 👉 Sustituye `project_id` por el "Reference ID" de tu proyecto
+#    (Dashboard → Project Settings → General → Reference ID).
+#
+# NOTA: la mayoría de estas claves solo afectan al entorno LOCAL (`supabase start`).
+# La autenticación del proyecto HOSPEDADO se configura en el dashboard (ver
+# supabase/README.md). Lo que la integración usa de este repo es la carpeta
+# `migrations/` + la presencia de este fichero.
+# =============================================================================
+
+project_id = "your-project-ref"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[db]
+port = 54322
+shadow_port = 54320
+major_version = 15
+
+[studio]
+enabled = true
+port = 54323
+
+[auth]
+enabled = true
+# Ajusta a tu despliegue (GitHub Pages) para los enlaces de auth.
+site_url = "http://localhost:4321"
+additional_redirect_urls = []
+jwt_expiry = 3600
+# Postura GASA: los usuarios los crea la PROVISIÓN con service_role (admin),
+# no el registro público. Desactivamos el alta abierta (equivalente hospedado:
+# Authentication → Providers → Email → "Allow new users to sign up" = OFF).
+enable_signup = false
+
+[auth.email]
+# Login = candidato_id + código sobre un email sintético interno. El alta usa la
+# Admin API con email_confirm=true, así que no hacen falta confirmaciones.
+enable_signup = false
+enable_confirmations = false

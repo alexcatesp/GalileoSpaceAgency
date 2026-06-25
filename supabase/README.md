@@ -32,13 +32,46 @@ diagnostico(candidato_id FK, score_transversal, score_especifico)  -- privado de
 
 ## Estado
 
-🚧 `migrations/` vacío en el andamiaje v0.1. La primera migración (tablas + RLS + auth
-seudónima) corresponde a la fase PRD §9.2 — fuera del alcance de este andamiaje.
+✅ Migración inicial en `migrations/20260625000000_estado_inicial.sql`: tablas
+`candidato` / `logro` / `diagnostico` + RLS + helper de auth seudónima (PRD §9.2).
 
-## Aplicar migraciones (cuando existan)
+## Aplicar el esquema — integración GitHub → Supabase
+
+Este repo está preparado para que **Supabase aplique las migraciones solo** al hacer
+push. Pasos (una vez):
+
+1. Crea el proyecto en [supabase.com](https://supabase.com) y copia su **Reference ID**
+   (Project Settings → General).
+2. Pega ese ref en `supabase/config.toml` → `project_id = "..."`.
+3. En el dashboard: **Project Settings → Integrations → GitHub** → conecta este repo
+   (`alexcatesp/iesgalileo_2627`) y elige la rama de producción. A partir de ahí, cada
+   push con migraciones nuevas se aplica a la BD.
+4. Copia `.env.example` → `.env` y rellena `PUBLIC_SUPABASE_URL` /
+   `PUBLIC_SUPABASE_ANON_KEY` (Project Settings → API).
+
+> Convención de migraciones: ficheros `migrations/<timestamp>_nombre.sql`. Supabase
+> ejecuta cada una **una sola vez** (las registra por su `<timestamp>`). Para un cambio
+> de esquema, añade un fichero nuevo; no edites uno ya aplicado.
+
+### Alternativa: CLI manual
 
 ```bash
-# con la CLI de Supabase, contra tu proyecto:
 supabase link --project-ref <tu-ref>
 supabase db push
 ```
+
+## Configuración del dashboard (auth) — importante
+
+`config.toml` solo afecta al entorno local. En el **proyecto hospedado**, ajusta a mano:
+
+- **Authentication → Providers → Email**: deja el proveedor Email activo (el login usa
+  email sintético + contraseña), y **desactiva "Allow new users to sign up"** — los
+  usuarios los crea la provisión con `service_role`, no el registro público.
+- No hace falta SMTP ni confirmaciones: la provisión crea los usuarios con
+  `email_confirm: true` vía Admin API.
+
+## Provisión de candidatos (NO la hace la integración)
+
+La integración solo aplica el **esquema**. Dar de alta los `candidato_id` + códigos con
+su claim `app_metadata.candidato_id` es trabajo de `tools/provision/provision.mjs`
+(usa `service_role` en local). Ver [`tools/provision/README.md`](../tools/provision/README.md).
