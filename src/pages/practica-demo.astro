@@ -1,0 +1,139 @@
+---
+import Base from '../layouts/Base.astro';
+// DEMO / BANCO DE PRUEBAS del contrato de práctica. Hace de stand-in del motor
+// de práctica que aportaría un módulo real. La ejecución real (runner de SQL,
+// editor de código, validador contra contenedor…) es del módulo (PRD §3.1); aquí
+// solo se demuestra la FRONTERA: superar un ticket -> registrarIntento -> logro.
+import ilCfg from '../../modules/_template/il.json';
+import ceCfg from '../../modules/_template/ce.json';
+import moduloCfg from '../../modules/_template/modulo.json';
+
+const data = {
+  il: ilCfg.il,
+  ce: ceCfg.ce,
+  modulo: { nombre: moduloCfg.nombre },
+};
+---
+
+<Base title="Demo de práctica · GASA">
+  <main>
+    <p class="kicker">GAlileo Space Agency · Contrato de práctica (demo)</p>
+    <h1>Banco de pruebas</h1>
+    <p class="lead">
+      Esto <strong>simula el motor de práctica</strong> de un módulo. Cada "ticket" es un
+      Indicador de Logro: al superarlo se llama al <em>contrato</em>
+      (<code>registrarIntento</code>) y se deposita un <code>logro</code>. La XP, el rango,
+      la credencial y el mapa se actualizan solos a partir de ahí.
+    </p>
+    <p class="aviso">
+      ⚠️ Demostración del shell. El motor real (ejecución del reto) lo aporta cada módulo;
+      aquí solo se prueba la frontera de registro.
+    </p>
+
+    <script type="application/json" id="gasa-practica" is:inline set:html={JSON.stringify(data)} />
+
+    <p id="estado-xp" class="estado-xp"></p>
+    <div id="tickets" class="tickets"></div>
+    <p id="msg" class="msg" hidden></p>
+
+    <p id="sin-sesion" class="nota" hidden>
+      No hay sesión. <a id="link-ingreso" href="">Pasa por la ficha de ingreso</a> primero.
+    </p>
+
+    <p class="acciones">
+      <a id="link-credencial" href="">Credencial</a> ·
+      <a id="link-mapa" href="">Mapa →</a>
+    </p>
+  </main>
+
+  <style>
+    main { max-width: 52rem; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+    .kicker { color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; margin: 0; }
+    h1 { font-size: clamp(2.2rem, 8vw, 3.4rem); margin: 0.2em 0 0.3em; }
+    .lead { color: var(--fg); max-width: 52ch; }
+    .aviso { color: var(--muted); font-size: 0.9rem; }
+    .estado-xp { color: var(--accent); font-weight: 700; font-size: 1.1rem; }
+    .tickets { display: grid; gap: 0.6rem; margin-top: 0.5rem; }
+    .ticket {
+      display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+      padding: 0.7rem 1rem; border: 1px solid #1e3357; border-radius: 0.6rem; background: #0c1626;
+    }
+    .ticket .info { font-size: 0.95rem; }
+    .ticket .meta { color: var(--muted); font-size: 0.8rem; }
+    .ticket.hecho { border-color: #2c6b4f; }
+    button {
+      padding: 0.45rem 0.9rem; border-radius: 0.5rem; border: 0; cursor: pointer;
+      background: var(--accent); color: #04121f; font-weight: 700; white-space: nowrap;
+    }
+    button:disabled { background: #1a3a2c; color: #6fe0a8; cursor: default; }
+    .msg { margin-top: 1rem; padding: 0.6rem 0.9rem; border-radius: 0.5rem; background: #0c1626; border: 1px solid #1e3357; }
+    .nota, .acciones { color: var(--muted); margin-top: 1.5rem; }
+    a { color: var(--accent); }
+    code { background: #0c1626; padding: 0.1em 0.4em; border-radius: 0.3em; color: var(--accent); }
+  </style>
+
+  <script>
+    import { getEstado } from '../lib/estado/index';
+    import { registrarIntento } from '../lib/practica';
+    import { xpTotal } from '../lib/progresion';
+    import type { IL, CE } from '../lib/tipos';
+
+    interface Data { il: IL[]; ce: CE[]; modulo: { nombre: string }; }
+    const data: Data = JSON.parse(document.getElementById('gasa-practica')!.textContent!);
+    const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+    const $ = (id: string) => document.getElementById(id)!;
+
+    (document.getElementById('link-ingreso') as HTMLAnchorElement).href = `${base}/ingreso`;
+    (document.getElementById('link-credencial') as HTMLAnchorElement).href = `${base}/credencial`;
+    (document.getElementById('link-mapa') as HTMLAnchorElement).href = `${base}/mapa`;
+
+    const estado = await getEstado();
+    const candidato = (await estado.sesionActual()) ? await estado.getCandidato() : null;
+    if (!candidato) {
+      $('sin-sesion').hidden = false;
+    } else {
+      await render();
+    }
+
+    async function render() {
+      const logros = await estado.getLogros();
+      const logrados = new Set(logros.map((l) => l.il_id));
+      $('estado-xp').textContent = `XP total: ${xpTotal(logros)} · ${logrados.size}/${data.il.length} indicadores certificados`;
+
+      const descCE = new Map(data.ce.map((c) => [c.ce_id, c.descripcion]));
+      $('tickets').innerHTML = data.il
+        .map((il) => {
+          const hecho = logrados.has(il.il_id);
+          return `<div class="ticket ${hecho ? 'hecho' : ''}">
+            <span class="info">
+              <strong>${esc(il.il_id)}</strong> · ${esc(il.nivel)} · ${il.xp} XP<br>
+              <span class="meta">${esc(descCE.get(il.ce_id) ?? il.ce_id)}</span>
+            </span>
+            <button data-il="${esc(il.il_id)}" ${hecho ? 'disabled' : ''}>${hecho ? '✓ Certificado' : 'Superar ticket'}</button>
+          </div>`;
+        })
+        .join('');
+
+      $('tickets')
+        .querySelectorAll<HTMLButtonElement>('button[data-il]')
+        .forEach((btn) =>
+          btn.addEventListener('click', async () => {
+            btn.disabled = true;
+            const res = await registrarIntento({ il_id: btn.dataset.il!, superado: true }, data.il);
+            const msg = $('msg');
+            msg.hidden = false;
+            if (res.registrado) {
+              msg.textContent = `✓ Logro registrado: ${res.logro!.il_id} (${res.logro!.nivel}, +${res.logro!.xp} XP).`;
+            } else {
+              msg.textContent = `Sin cambios (${res.motivo}).`;
+            }
+            await render(); // re-deriva XP/tickets
+          }),
+        );
+    }
+
+    function esc(s: string): string {
+      return s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
+    }
+  </script>
+</Base>

@@ -19,5 +19,6 @@ xp_total(candidato) = Σ logro.xp
 rango(candidato)    = máx rango con xp_umbral ≤ xp_total
 ```
 
-El cálculo derivado de `xp_total` y `rango` se implementará en fase posterior (PRD §9.3),
-leyendo `logro` desde Supabase + esta config. No se almacena ningún total ni rango.
+El cálculo derivado de `xp_total` y `rango` está en `src/lib/progresion.ts` (PRD §9.3),
+leyendo `logro` vía el adaptador de estado + esta config. No se almacena ningún total ni
+rango: se recalcula en cada consulta/render.

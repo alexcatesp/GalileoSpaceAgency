@@ -1,6 +1,9 @@
 {
-  "descripcion": "Criterios de Evaluación (hitos del mapa). Cada CE cuelga de un RA. PRD §5.4. Ejemplo mínimo.",
+  "descripcion": "Criterios de Evaluación (hitos del mapa). Cada CE cuelga de un RA. PRD §5.4. Ejemplo coherente — sustituir por el contenido real.",
   "ce": [
-    { "ce_id": "CE1.1", "ra_id": "RA1", "descripcion": "<descripción del CE1.1>" }
+    { "ce_id": "CE1.1", "ra_id": "RA1", "descripcion": "Hito 1 — primer criterio de RA1." },
+    { "ce_id": "CE1.2", "ra_id": "RA1", "descripcion": "Hito 2 — segundo criterio de RA1." },
+    { "ce_id": "CE2.1", "ra_id": "RA2", "descripcion": "Hito 3 — primer criterio de RA2." },
+    { "ce_id": "CE2.2", "ra_id": "RA2", "descripcion": "Hito 4 — segundo criterio de RA2." }
   ]
 }

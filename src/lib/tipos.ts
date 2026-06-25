@@ -43,4 +43,33 @@ export interface ItemDiagnostico {
   respuesta_correcta: number;
 }
 
+/** Criterio de Evaluación — hito del mapa (config por módulo, PRD §5.4). */
+export interface CE {
+  ce_id: string;
+  ra_id: string;
+  descripcion: string;
+}
+
+/** Indicador de Logro — unidad de evaluación y fuente de XP (config por módulo, PRD §5.4). */
+export interface IL {
+  il_id: string;
+  ce_id: string;
+  nivel: Nivel;
+  xp: number;
+  descripcion: string;
+}
+
+/** Nodo del mapa de misión (config por módulo, PRD §5.4). */
+export interface NodoMapa {
+  nodo_id: string;
+  ce_id: string;
+  titulo: string;
+  depende_de: string | null;
+  x: number;
+  y: number;
+}
+
+/** Estado DERIVADO de un nodo del mapa (no se persiste, PRD §5.5). */
+export type EstadoNodo = 'bloqueado' | 'disponible' | 'completado';
+
 export const RE_CANDIDATO_ID = /^GASA-[0-9]{4}-[0-9]{3}$/;

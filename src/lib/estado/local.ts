@@ -87,4 +87,13 @@ export class LocalAdapter implements EstadoAdapter {
     const raw = localStorage.getItem(K_LOGROS(id));
     return raw ? (JSON.parse(raw) as Logro[]) : [];
   }
+
+  async registrarLogro(logro: Pick<Logro, 'il_id' | 'nivel' | 'xp'>): Promise<Logro> {
+    const id = await this.idSesion();
+    const fila: Logro = { ...logro, ts: new Date().toISOString() };
+    const logros = await this.getLogros();
+    logros.push(fila); // append-only
+    localStorage.setItem(K_LOGROS(id), JSON.stringify(logros));
+    return fila;
+  }
 }

@@ -93,4 +93,17 @@ export class SupabaseAdapter implements EstadoAdapter {
       .order('ts', { ascending: true });
     return (data as Logro[]) ?? [];
   }
+
+  async registrarLogro(logro: Pick<Logro, 'il_id' | 'nivel' | 'xp'>): Promise<Logro> {
+    const candidato_id = await this.candidatoIdDeSesion();
+    if (!candidato_id) throw new Error('No hay sesión válida.');
+    // INSERT en el log append-only; RLS exige candidato_id = el del JWT.
+    const { data, error } = await this.sb
+      .from('logro')
+      .insert({ candidato_id, il_id: logro.il_id, nivel: logro.nivel, xp: logro.xp })
+      .select('il_id, nivel, xp, ts')
+      .single();
+    if (error) throw new Error(`No se pudo registrar el logro: ${error.message}`);
+    return data as Logro;
+  }
 }

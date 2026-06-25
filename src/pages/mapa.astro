@@ -1,0 +1,147 @@
+---
+import Base from '../layouts/Base.astro';
+// Config POR MÓDULO (MVP -> instancia _template). El render es agnóstico.
+import nodoCfg from '../../modules/_template/nodo_mapa.json';
+import ilCfg from '../../modules/_template/il.json';
+import ceCfg from '../../modules/_template/ce.json';
+import moduloCfg from '../../modules/_template/modulo.json';
+
+const data = {
+  nodos: nodoCfg.nodo_mapa,
+  il: ilCfg.il,
+  ce: ceCfg.ce,
+  modulo: { nombre: moduloCfg.nombre, planeta: moduloCfg.planeta },
+};
+---
+
+<Base title="Mapa de misión · GASA">
+  <main>
+    <p class="kicker">GAlileo Space Agency · Mapa de misión</p>
+    <h1>Mapa de misión</h1>
+    <p class="lead">
+      El roadmap del módulo como árbol de hitos. Un plano que se <strong>rellena</strong>:
+      cada nodo se ilumina cuando certificas su hito. Estado <em>derivado</em> de tus
+      logros — no se guarda.
+    </p>
+
+    <script type="application/json" id="gasa-mapa" is:inline set:html={JSON.stringify(data)} />
+
+    <p id="resumen" class="resumen"></p>
+    <div id="contenedor" class="contenedor"></div>
+
+    <ul class="leyenda">
+      <li><span class="pico completado"></span> Completado</li>
+      <li><span class="pico disponible"></span> Disponible</li>
+      <li><span class="pico bloqueado"></span> Bloqueado</li>
+    </ul>
+
+    <p id="sin-sesion" class="nota" hidden>
+      No hay sesión. <a id="link-ingreso" href="">Pasa por la ficha de ingreso</a>.
+    </p>
+
+    <p class="acciones">
+      <a id="link-credencial" href="">← Credencial</a> ·
+      <a id="link-practica" href="">Demo de práctica →</a>
+    </p>
+  </main>
+
+  <style>
+    main { max-width: 56rem; margin: 0 auto; padding: 3rem 1.5rem 5rem; }
+    .kicker { color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; margin: 0; }
+    h1 { font-size: clamp(2.2rem, 8vw, 3.4rem); margin: 0.2em 0 0.3em; }
+    .lead { color: var(--fg); max-width: 52ch; }
+    .resumen { color: var(--accent); font-weight: 600; }
+    .contenedor { overflow-x: auto; border: 1px solid #1e3357; border-radius: 0.8rem; background: #0a1322; margin-top: 0.5rem; }
+    .nota { color: var(--muted); }
+    .leyenda { list-style: none; display: flex; gap: 1.5rem; padding: 0; margin: 1rem 0; color: var(--muted); font-size: 0.9rem; flex-wrap: wrap; }
+    .leyenda li { display: flex; align-items: center; gap: 0.4rem; }
+    .pico { width: 14px; height: 14px; border-radius: 4px; display: inline-block; }
+    .pico.completado { background: var(--accent); }
+    .pico.disponible { background: transparent; border: 2px solid var(--accent); }
+    .pico.bloqueado { background: #1a2a44; }
+    .acciones { margin-top: 2rem; }
+    a { color: var(--accent); }
+  </style>
+
+  <script>
+    import { getEstado } from '../lib/estado/index';
+    import { estadoDelMapa, type NodoConEstado } from '../lib/mapa';
+    import type { IL, CE, NodoMapa } from '../lib/tipos';
+
+    interface Data {
+      nodos: NodoMapa[];
+      il: IL[];
+      ce: CE[];
+      modulo: { nombre: string; planeta: string };
+    }
+    const data: Data = JSON.parse(document.getElementById('gasa-mapa')!.textContent!);
+    const base = import.meta.env.BASE_URL.replace(/\/$/, '');
+    const $ = (id: string) => document.getElementById(id)!;
+
+    (document.getElementById('link-ingreso') as HTMLAnchorElement).href = `${base}/ingreso`;
+    (document.getElementById('link-credencial') as HTMLAnchorElement).href = `${base}/credencial`;
+    (document.getElementById('link-practica') as HTMLAnchorElement).href = `${base}/practica-demo`;
+
+    const estado = await getEstado();
+    const candidato = (await estado.sesionActual()) ? await estado.getCandidato() : null;
+    const logros = candidato ? await estado.getLogros() : [];
+    if (!candidato) $('sin-sesion').hidden = false;
+
+    const nodos = estadoDelMapa(data.nodos, logros, data.il);
+    const descCE = new Map(data.ce.map((c) => [c.ce_id, c.descripcion]));
+
+    const completados = nodos.filter((n) => n.estado === 'completado').length;
+    $('resumen').textContent = `Misión ${data.modulo.nombre} · ${completados} / ${nodos.length} hitos completados.`;
+
+    // --- Layout del plano estático -----------------------------------------
+    const CELL_X = 180, CELL_Y = 120, PAD = 60, W = 150, H = 58;
+    const maxX = Math.max(...nodos.map((n) => n.x));
+    const maxY = Math.max(...nodos.map((n) => n.y));
+    const width = PAD * 2 + maxX * CELL_X + W;
+    const height = PAD * 2 + maxY * CELL_Y + H;
+    const cx = (n: NodoConEstado) => PAD + n.x * CELL_X;
+    const cy = (n: NodoConEstado) => PAD + n.y * CELL_Y;
+    const porId = new Map(nodos.map((n) => [n.nodo_id, n]));
+
+    const COLOR: Record<string, { fill: string; stroke: string; text: string; dash: string }> = {
+      completado: { fill: '#5ad1ff', stroke: '#5ad1ff', text: '#04121f', dash: '' },
+      disponible: { fill: '#0c1626', stroke: '#5ad1ff', text: '#e8eefc', dash: '' },
+      bloqueado: { fill: '#0c1626', stroke: '#2a3f63', text: '#5d709a', dash: '6 5' },
+    };
+
+    // aristas (depende_de) por detrás de los nodos
+    const aristas = nodos
+      .filter((n) => n.depende_de && porId.has(n.depende_de))
+      .map((n) => {
+        const p = porId.get(n.depende_de!)!;
+        const activa = p.estado === 'completado';
+        return `<line x1="${cx(p) + W}" y1="${cy(p) + H / 2}" x2="${cx(n)}" y2="${cy(n) + H / 2}"
+          stroke="${activa ? '#5ad1ff' : '#2a3f63'}" stroke-width="2" stroke-dasharray="${activa ? '' : '6 5'}" />`;
+      })
+      .join('');
+
+    const cajas = nodos
+      .map((n) => {
+        const c = COLOR[n.estado];
+        const icono = n.estado === 'completado' ? '✓ ' : n.estado === 'bloqueado' ? '🔒 ' : '';
+        const titulo = `${descCE.get(n.ce_id) ?? n.ce_id}`;
+        return `<g>
+          <title>${escapeHtml(titulo)} — ${n.estado}</title>
+          <rect x="${cx(n)}" y="${cy(n)}" width="${W}" height="${H}" rx="12"
+            fill="${c.fill}" stroke="${c.stroke}" stroke-width="2" stroke-dasharray="${c.dash}" />
+          <text x="${cx(n) + W / 2}" y="${cy(n) + H / 2 - 4}" text-anchor="middle"
+            fill="${c.text}" font-size="15" font-weight="700" font-family="system-ui">${escapeHtml(icono + n.titulo)}</text>
+          <text x="${cx(n) + W / 2}" y="${cy(n) + H / 2 + 14}" text-anchor="middle"
+            fill="${c.text}" font-size="11" font-family="ui-monospace,monospace" opacity="0.8">${escapeHtml(n.ce_id)}</text>
+        </g>`;
+      })
+      .join('');
+
+    $('contenedor').innerHTML = `<svg viewBox="0 0 ${width} ${height}" width="${width}" height="${height}"
+      role="img" aria-label="Mapa de misión">${aristas}${cajas}</svg>`;
+
+    function escapeHtml(s: string): string {
+      return s.replace(/[&<>"']/g, (ch) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[ch]!);
+    }
+  </script>
+</Base>

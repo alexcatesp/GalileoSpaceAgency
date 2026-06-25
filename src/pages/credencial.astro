@@ -39,6 +39,8 @@ const rangos = rangoConfig.rangos;
     </p>
 
     <p class="acciones">
+      <a id="link-mapa" href="">Mapa de misión</a> ·
+      <a id="link-practica" href="">Demo de práctica</a> ·
       <a id="btn-salir" href="#">Salir</a>
     </p>
   </main>
@@ -83,6 +85,8 @@ const rangos = rangoConfig.rangos;
     const $ = (id: string) => document.getElementById(id)!;
 
     (document.getElementById('link-ingreso') as HTMLAnchorElement).href = `${base}/ingreso`;
+    (document.getElementById('link-mapa') as HTMLAnchorElement).href = `${base}/mapa`;
+    (document.getElementById('link-practica') as HTMLAnchorElement).href = `${base}/practica-demo`;
 
     const estado = await getEstado();
     const candidato = (await estado.sesionActual()) ? await estado.getCandidato() : null;

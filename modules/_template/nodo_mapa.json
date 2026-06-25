@@ -1,6 +1,9 @@
 {
-  "descripcion": "Nodos del mapa de misión. Cada nodo cuelga de un CE. depende_de = prerequisito (id de otro nodo, o null si es raíz). x/y = posición en el plano estático. PRD §5.4. Ejemplo mínimo.",
+  "descripcion": "Nodos del mapa de misión. Cada nodo cuelga de un CE. depende_de = prerequisito (nodo_id de otro nodo, o null si es raíz). x/y = posición en el plano estático (coordenadas de rejilla; el render las escala). PRD §5.4. Ejemplo coherente — sustituir.",
   "nodo_mapa": [
-    { "nodo_id": "N1", "ce_id": "CE1.1", "titulo": "<título del hito>", "depende_de": null, "x": 0, "y": 0 }
+    { "nodo_id": "N1", "ce_id": "CE1.1", "titulo": "Hito 1", "depende_de": null, "x": 0, "y": 1 },
+    { "nodo_id": "N2", "ce_id": "CE1.2", "titulo": "Hito 2", "depende_de": "N1", "x": 1, "y": 1 },
+    { "nodo_id": "N3", "ce_id": "CE2.1", "titulo": "Hito 3", "depende_de": "N2", "x": 2, "y": 0 },
+    { "nodo_id": "N4", "ce_id": "CE2.2", "titulo": "Hito 4", "depende_de": "N2", "x": 2, "y": 2 }
   ]
 }

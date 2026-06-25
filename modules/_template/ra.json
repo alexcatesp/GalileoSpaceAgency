@@ -1,6 +1,7 @@
 {
-  "descripcion": "Resultados de Aprendizaje (objetivos de misión). PRD §5.4. Ejemplo mínimo — sustituir por el contenido real del módulo.",
+  "descripcion": "Resultados de Aprendizaje (objetivos de misión). PRD §5.4. Ejemplo coherente para demostrar mapa/contrato — sustituir por el contenido real del módulo.",
   "ra": [
-    { "ra_id": "RA1", "descripcion": "<descripción del RA1>" }
+    { "ra_id": "RA1", "descripcion": "RA de ejemplo 1 — fundamentos del dominio del módulo." },
+    { "ra_id": "RA2", "descripcion": "RA de ejemplo 2 — aplicación práctica del dominio." }
   ]
 }

@@ -36,6 +36,13 @@ export interface EstadoAdapter {
   getCandidato(): Promise<Candidato | null>;
   /** Logros del candidato de la sesión (para derivar XP/rango/credencial). */
   getLogros(): Promise<Logro[]>;
+  /**
+   * Registra una certificación: una fila nueva en el LOG append-only `logro`.
+   * Es el punto de entrada del CONTRATO DE PRÁCTICA (PRD §3.2, §9.7): el motor
+   * de práctica de cualquier módulo deposita aquí su resultado, sin que el shell
+   * sepa nada de la tecnología del módulo.
+   */
+  registrarLogro(logro: Pick<Logro, 'il_id' | 'nivel' | 'xp'>): Promise<Logro>;
 }
 
 let _adapter: EstadoAdapter | null = null;

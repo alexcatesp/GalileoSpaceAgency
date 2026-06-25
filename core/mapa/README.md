@@ -16,4 +16,15 @@ candidato para decidir qué nodos están iluminados/bloqueados.
 mapa = nodos iluminados según los CE con IL logrados
 ```
 
-🚧 Pendiente de construir (PRD §9.6). Solo esqueleto en esta fase.
+## Estados de nodo (derivados)
+
+- **completado** — su CE está cubierto (tiene al menos un IL logrado).
+- **disponible** — no completado, pero su `depende_de` está cubierto (o es raíz).
+- **bloqueado** — su prerequisito aún no está cubierto.
+
+## Implementación (PRD §9.6) ✅
+
+- `src/lib/mapa.ts` — `estadoDelMapa(nodos, logros, catalogoIL)`: derivación pura,
+  sin estado persistido.
+- `src/pages/mapa.astro` — render del plano estático (SVG): nodos por `x/y`, aristas
+  de `depende_de`, color por estado. Lee los `logro` del candidato vía el adaptador.
