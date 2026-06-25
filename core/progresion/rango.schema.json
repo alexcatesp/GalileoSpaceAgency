@@ -1,0 +1,24 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Config de rangos GASA",
+  "type": "object",
+  "required": ["rangos"],
+  "properties": {
+    "descripcion": { "type": "string" },
+    "rangos": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["rango_id", "nombre", "xp_umbral", "orden"],
+        "additionalProperties": false,
+        "properties": {
+          "rango_id": { "type": "string", "description": "Identificador estable (slug)." },
+          "nombre": { "type": "string", "description": "Nombre mostrado." },
+          "xp_umbral": { "type": "integer", "minimum": 0, "description": "XP mínima para alcanzar el rango." },
+          "orden": { "type": "integer", "minimum": 1, "description": "Orden ascendente del rango." }
+        }
+      }
+    }
+  }
+}

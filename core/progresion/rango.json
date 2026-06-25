@@ -1,0 +1,10 @@
+{
+  "$schema": "./rango.schema.json",
+  "descripcion": "Config agnóstica de módulo: escala de rangos del shell GASA. Fuente de verdad en git (PRD §5.3). El rango de un candidato se DERIVA: máx rango con xp_umbral <= xp_total. No se persiste.",
+  "rangos": [
+    { "rango_id": "recluta",       "nombre": "Recluta",          "xp_umbral": 0,    "orden": 1 },
+    { "rango_id": "especialista",  "nombre": "Especialista",     "xp_umbral": 100,  "orden": 2 },
+    { "rango_id": "oficial",       "nombre": "Oficial",          "xp_umbral": 300,  "orden": 3 },
+    { "rango_id": "jefe_mision",   "nombre": "Jefe de Misión",   "xp_umbral": 600,  "orden": 4 }
+  ]
+}

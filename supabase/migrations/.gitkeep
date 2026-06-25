@@ -1,0 +1,2 @@
+# Las migraciones SQL del esquema de estado (tablas + RLS + auth seudónima) van aquí.
+# Vacío en el andamiaje v0.1 — ver supabase/README.md y PRD §9.2.

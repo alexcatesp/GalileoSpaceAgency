@@ -1,0 +1,8 @@
+{
+  "descripcion": "Indicadores de Logro (entregables/certificaciones): la unidad de evaluación y la fuente de XP. Cada IL cuelga de un CE, está graduado en tres niveles y otorga XP. PRD §5.4. LOS IL REALES LOS APORTA EL PROFESOR. Ejemplo mínimo.",
+  "il": [
+    { "il_id": "IL1.1.S", "ce_id": "CE1.1", "nivel": "Suficiente", "xp": 10, "descripcion": "<qué debe acreditar, concreto y observable>" },
+    { "il_id": "IL1.1.N", "ce_id": "CE1.1", "nivel": "Notable",    "xp": 20, "descripcion": "<qué debe acreditar, concreto y observable>" },
+    { "il_id": "IL1.1.E", "ce_id": "CE1.1", "nivel": "Excelente",  "xp": 30, "descripcion": "<qué debe acreditar, concreto y observable>" }
+  ]
+}

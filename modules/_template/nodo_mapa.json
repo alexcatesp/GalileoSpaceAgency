@@ -1,0 +1,6 @@
+{
+  "descripcion": "Nodos del mapa de misión. Cada nodo cuelga de un CE. depende_de = prerequisito (id de otro nodo, o null si es raíz). x/y = posición en el plano estático. PRD §5.4. Ejemplo mínimo.",
+  "nodo_mapa": [
+    { "nodo_id": "N1", "ce_id": "CE1.1", "titulo": "<título del hito>", "depende_de": null, "x": 0, "y": 0 }
+  ]
+}

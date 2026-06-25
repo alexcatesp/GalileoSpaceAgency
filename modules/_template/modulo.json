@@ -1,0 +1,13 @@
+{
+  "descripcion": "Parámetros de la instancia de módulo. El shell está parametrizado por (año, planeta, módulo) — PRD §6. Sustituir por valores reales al instanciar.",
+  "modulo_id": "_template",
+  "nombre": "Módulo de ejemplo (plantilla)",
+  "curso": 1,
+  "anio": "26-27",
+  "planeta": "Tierra",
+  "arco": "candidatos — la agencia opera en Tierra; el lanzamiento (capstone) cierra el curso",
+  "narrativa": {
+    "intro": "Texto de la transmisión de bienvenida (placeholder).",
+    "npcs": []
+  }
+}

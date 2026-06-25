@@ -1,0 +1,35 @@
+# dependencias
+node_modules/
+.pnp
+.pnp.js
+
+# build
+dist/
+.output/
+.vercel/
+.netlify/
+
+# astro
+.astro/
+
+# entorno — NUNCA commitear credenciales reales
+.env
+.env.local
+.env.*.local
+
+# ===========================================================================
+# ARTEFACTO SENSIBLE — requisito duro del PRD (§4, §5.1)
+# El fichero de mapeo `candidato_id <-> nombre_real <-> grupo` vive OFFLINE
+# en el disco del profesor y JAMÁS entra en git ni en el backend.
+# Estas reglas son una red de seguridad por si se copia por error al repo.
+# ===========================================================================
+mapeo*
+*mapeo*
+mapping*.csv
+orla*
+*.private.csv
+
+# logs / sistema
+*.log
+.DS_Store
+Thumbs.db

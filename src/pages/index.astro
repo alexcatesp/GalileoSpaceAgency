@@ -1,0 +1,54 @@
+---
+import Base from '../layouts/Base.astro';
+import rangoConfig from '../../core/progresion/rango.json';
+---
+
+<Base title="GASA — GAlileo Space Agency">
+  <main>
+    <header>
+      <p class="kicker">GAlileo Space Agency · IES Galileo · FP Informática</p>
+      <h1>GASA</h1>
+      <p class="lead">
+        Marco narrativo gamificado, agnóstico de módulo. La XP procede de los Indicadores
+        de Logro; el rango, el mapa y la credencial se <em>derivan</em> de un único log de
+        logros.
+      </p>
+      <p class="estado">🚧 Andamiaje v0.1 — estructura del monorepo. Sin Día 1 funcional todavía.</p>
+    </header>
+
+    <section>
+      <h2>Escala de rangos</h2>
+      <ol class="rangos">
+        {rangoConfig.rangos.map((r) => (
+          <li>
+            <span class="nombre">{r.nombre}</span>
+            <span class="umbral">{r.xp_umbral} XP</span>
+          </li>
+        ))}
+      </ol>
+      <p class="nota">
+        Config en <code>core/progresion/rango.json</code>. Umbrales placeholder,
+        configurables. El Día 1 todos embarcan como Recluta con XP 0.
+      </p>
+    </section>
+  </main>
+
+  <style>
+    main { max-width: 52rem; margin: 0 auto; padding: 4rem 1.5rem; }
+    .kicker { color: var(--accent); letter-spacing: 0.12em; text-transform: uppercase; font-size: 0.8rem; margin: 0; }
+    h1 { font-size: clamp(3rem, 12vw, 6rem); margin: 0.2em 0 0.1em; letter-spacing: 0.05em; }
+    .lead { color: var(--fg); font-size: 1.15rem; max-width: 40ch; }
+    .estado { color: var(--muted); font-size: 0.95rem; }
+    h2 { margin-top: 3rem; font-size: 1.3rem; }
+    .rangos { list-style: none; padding: 0; display: grid; gap: 0.5rem; }
+    .rangos li {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 0.7rem 1rem; border: 1px solid #1e3357; border-radius: 0.6rem;
+      background: #0c1626;
+    }
+    .nombre { font-weight: 600; }
+    .umbral { color: var(--accent); font-variant-numeric: tabular-nums; }
+    .nota { color: var(--muted); font-size: 0.9rem; }
+    code { background: #0c1626; padding: 0.1em 0.4em; border-radius: 0.3em; color: var(--accent); }
+  </style>
+</Base>

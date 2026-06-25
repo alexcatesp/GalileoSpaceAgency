@@ -1,0 +1,6 @@
+{
+  "descripcion": "Criterios de Evaluación (hitos del mapa). Cada CE cuelga de un RA. PRD §5.4. Ejemplo mínimo.",
+  "ce": [
+    { "ce_id": "CE1.1", "ra_id": "RA1", "descripcion": "<descripción del CE1.1>" }
+  ]
+}

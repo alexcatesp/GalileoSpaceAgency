@@ -1,0 +1,12 @@
+{
+  "descripcion": "Bloque ESPECÍFICO del diagnóstico de ingreso: conocimiento previo del dominio del módulo. Se inserta junto al bloque transversal del shell (core/ingreso). PRD §7.3. Recordatorio: el diagnóstico es privado del profesor y NO es XP ni ranking. Ejemplo mínimo.",
+  "items": [
+    {
+      "id": "ESP1",
+      "enunciado": "<pregunta de conocimiento previo del dominio>",
+      "tipo": "opcion_multiple",
+      "opciones": ["<a>", "<b>", "<c>", "<d>"],
+      "respuesta_correcta": 0
+    }
+  ]
+}
