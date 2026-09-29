@@ -76,3 +76,42 @@ supabase db push
 La integración solo aplica el **esquema**. Dar de alta los `candidato_id` + códigos con
 su claim `app_metadata.candidato_id` es trabajo de `tools/provision/provision.mjs`
 (usa `service_role` en local). Ver [`tools/provision/README.md`](../tools/provision/README.md).
+
+## Campus: panel del profesorado y liberación de capítulos
+
+Migración `20260929120000_campus_liberacion.sql`. El panel vive en
+`iesgalileo.alejandrocatalaespi.es/gasa/panel/` (su código está en el repositorio privado
+`iesgalileo-2026-27`, carpeta `modulos/DAM/gasa-campus/panel/`).
+
+- **Tablas:** `campus_admin`, `profesor`, `grupo`, `profesor_grupo` (qué módulo da cada
+  profesor y en qué grupo), `liberacion` (capítulos abiertos o programados por módulo y
+  grupo) y `campus_ajuste` (interruptor general `control_activo`, apagado por defecto).
+- **Permisos (RLS):** cada profesor ve y cambia solo las liberaciones de sus módulos en sus
+  grupos; el administrador, todo. El alumnado no lee ninguna tabla: el juego usa
+  `gasa_control()`, `gasa_grupo_por_clave(clave)` y `gasa_liberados(clave)`.
+- **Privacidad:** ningún correo en este repositorio (es público). El profesorado lo da de
+  alta el administrador desde el panel.
+
+### Acceso del profesorado: código de un solo uso por correo
+
+El panel usa el OTP por correo de Supabase Auth. Para que la cuenta de un profesor se cree
+sola la primera vez que entra, el registro tiene que estar **permitido**; el disparador
+`gasa_solo_autorizados` en `auth.users` rechaza cualquier alta que no sea de un correo de
+`profesor` o `campus_admin`, o de un candidato provisionado (con `app_metadata.candidato_id`).
+Esto sustituye a la recomendación anterior de desactivar el registro.
+
+Configuración en el dashboard (una vez):
+
+1. **Authentication → Sign In / Providers → Email:** activa *Allow new users to sign up*.
+   Deja *Confirm email* activo (verificar el código confirma el correo).
+2. **Authentication → Emails → Templates:** en *Magic Link* y en *Confirm signup*, pon el
+   código en el cuerpo con `{{ .Token }}` (por ejemplo: «Tu código de acceso al panel de la
+   GASA es {{ .Token }}. Caduca en 10 minutos.»).
+3. **Authentication → Emails → SMTP Settings:** activa el SMTP propio (Gmail): host
+   `smtp.gmail.com`, puerto `465`, usuario = la cuenta de Gmail, contraseña = una
+   *contraseña de aplicación* de Google (requiere verificación en dos pasos), remitente
+   la misma cuenta, nombre «GASA · Galileo Space Agency». Sin SMTP propio, Supabase solo
+   envía a los miembros del equipo del proyecto y con un límite muy bajo.
+4. **Authentication → Sign In / Providers → Email:** *Email OTP Expiration* = 600 s.
+5. **SQL Editor:** añade el primer administrador:
+   `insert into public.campus_admin (email) values ('<tu correo>');`
