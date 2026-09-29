@@ -103,7 +103,9 @@ Esto sustituye a la recomendación anterior de desactivar el registro.
 Configuración en el dashboard (una vez):
 
 1. **Authentication → Sign In / Providers → Email:** activa *Allow new users to sign up*.
-   Deja *Confirm email* activo (verificar el código confirma el correo).
+   *Confirm email* puede quedar desactivado: la migración 0005 rechaza cualquier alta con
+   contraseña, así que el profesorado solo entra con el código que recibe en su correo.
+   Pon también *URL Configuration → Site URL* = `https://iesgalileo.alejandrocatalaespi.es/gasa/panel/`.
 2. **Authentication → Emails → Templates:** en *Magic Link* y en *Confirm signup*, pon el
    código en el cuerpo con `{{ .Token }}` (por ejemplo: «Tu código de acceso al panel de la
    GASA es {{ .Token }}. Caduca en 10 minutos.»).
