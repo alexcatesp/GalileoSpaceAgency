@@ -107,11 +107,12 @@ Configuración en el dashboard (una vez):
 2. **Authentication → Emails → Templates:** en *Magic Link* y en *Confirm signup*, pon el
    código en el cuerpo con `{{ .Token }}` (por ejemplo: «Tu código de acceso al panel de la
    GASA es {{ .Token }}. Caduca en 10 minutos.»).
-3. **Authentication → Emails → SMTP Settings:** activa el SMTP propio (Gmail): host
-   `smtp.gmail.com`, puerto `465`, usuario = la cuenta de Gmail, contraseña = una
-   *contraseña de aplicación* de Google (requiere verificación en dos pasos), remitente
-   la misma cuenta, nombre «GASA · Galileo Space Agency». Sin SMTP propio, Supabase solo
-   envía a los miembros del equipo del proyecto y con un límite muy bajo.
+3. **Authentication → Emails → SMTP Settings:** SMTP propio con **Resend** (dominio
+   `alejandrocatalaespi.es` verificado en Resend, región Ireland, con sus registros DKIM y
+   `send` en el DNS de IONOS): host `smtp.resend.com`, puerto `465`, usuario `resend`,
+   contraseña = la API key de Resend (permiso de envío), remitente
+   `gasa@alejandrocatalaespi.es`, nombre «GASA · Galileo Space Agency». Sin SMTP propio,
+   Supabase solo envía a los miembros del equipo del proyecto y con un límite muy bajo.
 4. **Authentication → Sign In / Providers → Email:** *Email OTP Expiration* = 600 s.
 5. **SQL Editor:** añade el primer administrador:
    `insert into public.campus_admin (email) values ('<tu correo>');`
